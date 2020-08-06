@@ -26,8 +26,8 @@ public class ReactiveApiApplication {
             sink.next("hello");
         })
                 .delayElements(Duration.ofMillis(500))
-                .take(4)
-                .subscribe(System.out::println);
+                .take(4);
+                //.subscribe(System.out::println);
         //Thread.sleep(4001);
 
         Flux<Object> producer = Flux
@@ -69,17 +69,26 @@ public class ReactiveApiApplication {
         Flux<String> second = Flux.just("world", "coder").repeat();
         Flux<String> sumFlux = Flux
                 .just("hello", "dru", "java", "linus", "java")
-                .zipWith(second, (f, s) -> {
-                    return String.format("%s %s", f, s);
-                });
+                .zipWith(second, (f, s) -> String.format("%s %s", f, s));
 
-        sumFlux
-                .delayElements(Duration.ofMillis(1300))
-                .timeout(Duration.ofMillis(200))
+        Flux<String> string = sumFlux
+                .delayElements(Duration.ofMillis(1300));
+                //.timeout(Duration.ofSeconds(1))
                 //.onErrorReturn("Too slow")
-                .subscribe(So::pln);
+//                .onErrorResume(thr ->
+//                    //return Flux.just("one", "thwo");
+//                    Flux
+//                            .interval(Duration.ofMillis(300))
+//                            .map(String::valueOf)
+//                );
 
-        Thread.sleep(4001);
+        string.subscribe(
+            v -> So.pln(v),
+                e -> Se.pLn(e),
+                () -> So.pln("Complete")
+        );
+
+        Thread.sleep(5001);
 
 
 
